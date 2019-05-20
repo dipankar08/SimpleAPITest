@@ -13,8 +13,8 @@ program
   .option('-f, --file <path>', 'path of the test file')
   .parse(process.argv);
 
-program.server = "simplestore1.herokuapp.com"
-program.file = "./sample.txt"
+//program.server = "simplestore1.herokuapp.com"
+//program.file = "./sample.txt"
 
 if (program.server){
     //console.log("Server:"+program.server);
