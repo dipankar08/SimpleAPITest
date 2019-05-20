@@ -1,21 +1,10 @@
 #!/usr/bin/env node
-const RE_DATE = /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
-
-const matchObj = RE_DATE.exec('1999-12-31');
-const year = matchObj[1]; // 1999
-const month = matchObj[2]; // 12
-const day = matchObj[3]; // 31
-
-
 const fs = require('fs');
 var request = require('sync-request');
 const chalk = require('chalk');
 const util = require('util');
 const format = require('string-format')
 let ENDPOINT_URL ="localhost:8000"
-let ID = "5cdc9597a56a1d93486b867f";
-var program = require('commander');
-//console.log("[Info] Reading testfile...")
 
 var context = {}
 program
@@ -40,7 +29,6 @@ if(program.file){
 var contents = fs.readFileSync(program.file, 'utf8');
 var testcase = []
 var lines = contents.split("\n");
-
 for(var i =0;i<lines.length;i++){
     let tc = {};
     line = lines[i]
