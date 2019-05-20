@@ -11,7 +11,8 @@ npm install simpleapitest --save
 ```
 
 ### Writing a test case.
-Just create a test file as put the test case. Put a test case in each line and they will be executed one one by.
+Just create a test file as put the test case. Each line of taht file indicate one test case - very clear and super concise. 
+
 A sample testcase looks like:
 ```
 GET  => http://{server}/api/test0/test => 404 - We have not yet support this api
@@ -19,8 +20,10 @@ POST => http://{server}/api/test0/create => {"name":"dip","count":1} => success
 
 ```
 As you can see, we can test GET and POST call in a single line. 
-In case of GET call, the test case looks like : GET => <URL> => <Expected Output Substring>.
-In case of POST call, the test case looks like : POST => <URL> => <POST DATA> => <Expected Output Substring>.
+In case of GET call, the test case looks like :
+```GET => <URL> => <Expected Output Substring>.```
+In case of POST call, the test case looks like :
+```POST => <URL> => <POST DATA> => <Expected Output Substring>.```
  
 ### Setup and execute.
 Some test case rquire somesetup, like you can only make find only after inserting some entry. We might need to id which is returned by the setup call to test the update rest API.
