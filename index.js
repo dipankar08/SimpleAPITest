@@ -1,9 +1,11 @@
 #!/usr/bin/env node
+console.log("Start Testing..");
 const fs = require('fs');
 var request = require('sync-request');
 const chalk = require('chalk');
 const util = require('util');
 const format = require('string-format')
+var program = require('commander');
 let ENDPOINT_URL ="localhost:8000"
 
 var context = {}
