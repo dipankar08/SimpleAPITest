@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-console.log("Start Testing..");
 const fs = require('fs');
 var request = require('sync-request');
 const chalk = require('chalk');
