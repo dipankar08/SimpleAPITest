@@ -1,6 +1,6 @@
 {
   "name": "simpleapitest",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "simple test framworkd",
   "main": "index.js",
   "scripts": {

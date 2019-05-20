@@ -96,7 +96,7 @@ for(tc of testcase){
             matched = new namedRegexp(tc['expected']).exec(resStr);
         }
         catch(e){
-            console.log(chalk.blue(util.format("\n[INFO/%s] Invalid Reg Exp(marked failed): \n Invalid here: %s \n Trying to match: %s",tc.line, tc['expected'], resStr)));
+            console.log(chalk.red(util.format("\n[INFO/%s] Invalid Reg Exp(marked failed): \n Invalid here: %s \n Trying to match: %s",tc.line, tc['expected'], resStr)));
             fail_count++;
             continue;
         }
