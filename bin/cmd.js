@@ -5,13 +5,16 @@ const chalk = require('chalk');
 const util = require('util');
 const format = require('string-format')
 var program = require('commander');
-let ENDPOINT_URL ="localhost:8000"
+var namedRegexp = require("named-js-regexp");
 
 var context = {}
 program
   .option('-s, --server <url>', 'server endpoints')
   .option('-f, --file <path>', 'path of the test file')
   .parse(process.argv);
+
+program.server = "simplestore1.herokuapp.com"
+program.file = "./sample.txt"
 
 if (program.server){
     //console.log("Server:"+program.server);
@@ -22,12 +25,15 @@ if (program.server){
 }
 if(program.file){
     //console.log("File:" + program.file);
+    context.file = program.file;
 } else{
     console.log("You must pass a filepath: (node index.js -s google.com -f ./sample.txt )");
     return;
 }
 
-var contents = fs.readFileSync(program.file, 'utf8');
+
+
+var contents = fs.readFileSync(context.file, 'utf8');
 var testcase = []
 var lines = contents.split("\n");
 for(var i =0;i<lines.length;i++){
@@ -85,8 +91,14 @@ for(tc of testcase){
         }
 
         var resStr = res.getBody('utf8');
-
-        let matched = new RegExp(tc['expected']).exec(resStr);
+        var matched ;
+        try{
+            matched = new namedRegexp(tc['expected']).exec(resStr);
+        }
+        catch(e){
+            console.log(chalk.blue(util.format("Not able to RE for %s for %s", tc['expected'], resStr)));
+            console.log(e);
+        }
 
         if(matched == null) {
             console.log(chalk.red(util.format('\n[ERROR/%s] Output and Expected different:\nUrl:%s\nExpected: %s\nOutput:%s', tc.line,final_url,tc['expected'],resStr )));
@@ -101,9 +113,9 @@ for(tc of testcase){
         }
 
         // Try Capture Context which will be used lateron.
-        if(matched.groups != null){
-            console.log(chalk.blue(util.format("\n[INFO/%s] setting context: %o",tc.line, matched.groups)));
-            Object.assign(context, matched.groups);
+        if(matched.groups() != null){
+            Object.assign(context, matched.groups());
+            console.log(chalk.blue(util.format("\n[INFO/%s] setting context: %o",tc.line, matched.groups())));
         }
     } catch(e){
         fail_count++;
@@ -119,4 +131,4 @@ Fail Count: %s\n\
 Total TC: %s\n\
 Pass Percentage: %s\%\n\
 =======================================================\
-",pass_count, fail_count, testcase.length, (pass_count*100/testcase.length))));
+",pass_count, fail_count, pass_count+fail_count, (pass_count*100/(pass_count+fail_count)))));
