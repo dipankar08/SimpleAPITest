@@ -7,8 +7,9 @@ I beleave on a test frameworks which should take .0001% effots to test comparing
 
 ### How to install ?
 ```
-npm install simpleapitest --save
+sudo npm install simpleapitest -g
 ```
+This comamnd will install the script `simpleapitest` in the bin.
 
 ### Writing a test case.
 Just create a test file as put the test case. Each line of taht file indicate one test case - very clear and super concise. 
@@ -39,5 +40,5 @@ In the above example, we are inserting an item in the table and collecting the i
 ### Run test case:
 once you have write testcase, you can execute it easily like:
 ```
-node index.js -s simplestore1.herokuapp.com  -f ./sample.txt
+simpleapitest -s simplestore1.herokuapp.com  -f ./sample.txt
 ```
