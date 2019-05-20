@@ -8,6 +8,7 @@ I beleave on a test frameworks which should take .0001% effots to test comparing
 ### How to install ?
 ```
 sudo npm install simpleapitest -g
+sudo npm update simpleapitest -g
 ```
 This comamnd will install the script `simpleapitest` in the bin.
 
