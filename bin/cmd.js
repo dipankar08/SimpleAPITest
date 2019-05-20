@@ -13,8 +13,8 @@ program
   .option('-f, --file <path>', 'path of the test file')
   .parse(process.argv);
 
-//program.server = "simplestore1.herokuapp.com"
-//program.file = "./sample.txt"
+program.server = "simplestore1.herokuapp.com"
+program.file = "./sample.txt"
 
 if (program.server){
     //console.log("Server:"+program.server);
@@ -96,8 +96,9 @@ for(tc of testcase){
             matched = new namedRegexp(tc['expected']).exec(resStr);
         }
         catch(e){
-            console.log(chalk.blue(util.format("Not able to RE for %s for %s", tc['expected'], resStr)));
-            console.log(e);
+            console.log(chalk.blue(util.format("\n[INFO/%s] Invalid Reg Exp(marked failed): \n Invalid here: %s \n Trying to match: %s",tc.line, tc['expected'], resStr)));
+            fail_count++;
+            continue;
         }
 
         if(matched == null) {
@@ -113,7 +114,7 @@ for(tc of testcase){
         }
 
         // Try Capture Context which will be used lateron.
-        if(matched.groups() != null){
+        if(matched.groups() != null && Object.keys(matched.groups()).length > 0){
             Object.assign(context, matched.groups());
             console.log(chalk.blue(util.format("\n[INFO/%s] setting context: %o",tc.line, matched.groups())));
         }
