@@ -16,7 +16,7 @@ program
 
 //program.server = "simplestore1.herokuapp.com"
 //program.file = "./sample.txt"
-//program.line = 2;
+//program.line = 4;
 
 if (program.server){
     //console.log("Server:"+program.server);
@@ -34,49 +34,64 @@ if(program.file){
 }
 
 
+function build_test_from_line(line, i){
+    try{
+        var tc ={}
+        if(line[0] === '!'){
+            tc['isSetup'] = true;
+            line = line.substring(1, line.length);
+        }
+
+        tokens = line.split("=>");
+    
+        tc['line'] = i+1;
+        tc['method'] = tokens[0].trim()
+        tc['url'] = tokens[1].trim()
+        if(tc['method'] === 'GET'){
+            tc['expected'] = tokens[2].trim()
+        } else if(tc['method'] === 'POST'){
+            tc['data'] = tokens[2].trim()
+            tc['expected'] = tokens[3].trim()
+        } else{
+            console.log(chalk.blue(util.format('[ERROR/%s] Invalid Method found :%s', i, line)));
+        }
+        return tc
+    }
+    catch(e){
+        console.log(chalk.blue(util.format('[ERROR/%s] Invalid testcase:%s', i, line)));
+        console.log(e);
+    }
+}
 
 var contents = fs.readFileSync(context.file, 'utf8');
-var testcase = []
-var lines = contents.split("\n");
-for(var i =0;i<lines.length;i++){
-    let tc = {};
-    line = lines[i]
-    if(line.trim().length == 0){
-        continue;
-    }
-    if(line[0] === '#'){
-        continue;
-    }
-    if(line[0] === '!'){
-        tc['isSetup'] = true;
-        line = line.substring(1, line.length);
-    }
-    tokens = line.split("=>");
 
-    tc['line'] = i+1;
-    tc['method'] = tokens[0].trim()
-    tc['url'] = tokens[1].trim()
-    if(tc['method'] === 'GET'){
-        tc['expected'] = tokens[2].trim()
-    } else if(tc['method'] === 'POST'){
-        tc['data'] = tokens[2].trim()
-        tc['expected'] = tokens[3].trim()
-    } else{
-        console.log("[ERROR] Invalid Method in at line:"+(i+1));
-    }
-    testcase.push(tc);
-}
+var testcase = []
+
+var lines = contents.split("\n");
 if(program.line){
     // Execute only line that line:
     console.log("Executing a only line:"+program.line)
     program.line = parseInt(program.line) -1;;
-    if(program.line>=testcase.length){
-        console.log("Invalid number, The linenunber should be <= "+testcase.length)
+    if(program.line>=lines.length){
+        console.log("Invalid number, The line nunber should be <= "+lines.length)
         return;
     }
-    testcase = [testcase[program.line]];
+    testcase.push(build_test_from_line(lines[program.line], program.line));
     console.log(testcase);
+} else {
+    for(var i =0;i<lines.length;i++){
+        line = lines[i]
+        if(line.trim().length == 0){
+            continue;
+        }
+        if(line[0] === '#'){
+            continue;
+        }
+        testcase.push(build_test_from_line(line, i));
+    }
 }
+
+
 //console.log("[Info] Total tastcase : "+testcase.length)
 var pass_count = 0;
 var fail_count = 0;
