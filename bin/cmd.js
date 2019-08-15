@@ -11,10 +11,12 @@ var context = {}
 program
   .option('-s, --server <url>', 'server endpoints')
   .option('-f, --file <path>', 'path of the test file')
+  .option('-l, --line <line_number>', 'It will execute that number only.')
   .parse(process.argv);
 
 //program.server = "simplestore1.herokuapp.com"
 //program.file = "./sample.txt"
+//program.line = 2;
 
 if (program.server){
     //console.log("Server:"+program.server);
@@ -64,28 +66,43 @@ for(var i =0;i<lines.length;i++){
     }
     testcase.push(tc);
 }
+if(program.line){
+    // Execute only line that line:
+    console.log("Executing a only line:"+program.line)
+    program.line = parseInt(program.line) -1;;
+    if(program.line>=testcase.length){
+        console.log("Invalid number, The linenunber should be <= "+testcase.length)
+        return;
+    }
+    testcase = [testcase[program.line]];
+    console.log(testcase);
+}
 //console.log("[Info] Total tastcase : "+testcase.length)
 var pass_count = 0;
 var fail_count = 0;
 //console.log("[INFO] Executing...");
+
 for(tc of testcase){
-    jsondata = ''
+    var jsondata = ''
     try{
         if(tc.data != undefined){
-       jsondata= JSON.parse(tc.data)
+            // TODO : THIS IS A BUG AS THE CONTEXT IS NOT GETTING ADDED in BODY.
+            let final_data = tc.data; // format(tc.data, context); 
+            jsondata= JSON.parse(final_data)
         }
     } catch(e){
-        console.log(chalk.blue(util.format('\n[ERROR/%s] Invalid json payload:%s',tc.line, tc.data)));
+        console.log(chalk.blue(util.format('[ERROR/%s] Invalid json payload:%s',tc.line, tc.data)));
         jsondata = tc.data;
     }
     try{
         let final_url = format(tc.url, context);
+        console.log(chalk.hex('#454545')(util.format("\n[TEST/%s] Executing: %s",tc.line, final_url)));
         var res = request(tc.method,final_url , {
             json:jsondata
         });
 
         if(res.statusCode != 200){
-            console.log(chalk.red(util.format('\n[ERROR/%s] Error as res.statusCode :%s', tc.line, res.statusCode)));
+            console.log(chalk.red(util.format('[ERROR/%s] Error as res.statusCode :%s', tc.line, res.statusCode)));
             fail_count++;
             continue;
         }
@@ -96,34 +113,35 @@ for(tc of testcase){
             matched = new namedRegexp(tc['expected']).exec(resStr);
         }
         catch(e){
-            console.log(chalk.red(util.format("\n[INFO/%s] Invalid Reg Exp(marked failed): \n Invalid here: %s \n Trying to match: %s",tc.line, tc['expected'], resStr)));
+            console.log(chalk.red(util.format("[INFO/%s] Invalid Reg Exp(marked failed): \n Invalid here: %s \n Trying to match: %s",tc.line, tc['expected'], resStr)));
             fail_count++;
             continue;
         }
 
         if(matched == null) {
-            console.log(chalk.red(util.format('\n[ERROR/%s] Output and Expected different:\nUrl:%s\nExpected: %s\nOutput:%s', tc.line,final_url,tc['expected'],resStr )));
+            console.log(chalk.red(util.format('[ERROR/%s] Output and Expected different:\nUrl:%s\nExpected: %s\nOutput:%s', tc.line,final_url,tc['expected'],resStr )));
             fail_count++;
             continue;
         }
         if(tc.isSetup != true){
-            console.log(chalk.green(util.format('\n[INFO/%s] Test passed',tc.line)));
+            console.log(chalk.green(util.format('[INFO/%s] Test passed',tc.line)));
             pass_count++;
         } else{
-            console.log(chalk.blue(util.format('\n[INFO/%s] Setup request Success',tc.line)));
+            console.log(chalk.blue(util.format('[INFO/%s] Setup request Success',tc.line)));
         }
 
         // Try Capture Context which will be used lateron.
         if(matched.groups() != null && Object.keys(matched.groups()).length > 0){
             Object.assign(context, matched.groups());
-            console.log(chalk.blue(util.format("\n[INFO/%s] setting context: %o",tc.line, matched.groups())));
+            console.log(chalk.blue(util.format("[INFO/%s] Updated context: %o",tc.line, matched.groups())));
         }
     } catch(e){
         fail_count++;
-        console.log(chalk.blue(util.format('\n[ERROR/%s] Test INFRA Exception: %s', tc.line, e)));
+        console.log(chalk.blue(util.format('[ERROR/%s] Test INFRA Exception: %s', tc.line, e)));
     }
 }
-console.log(chalk.red(util.format("\n\n\
+
+let result = util.format("\n\n\
 =======================================================\n\
                         SUMMARY                        \n\
 =======================================================\n\
@@ -132,4 +150,10 @@ Fail Count: %s\n\
 Total TC: %s\n\
 Pass Percentage: %s\%\n\
 =======================================================\
-",pass_count, fail_count, pass_count+fail_count, (pass_count*100/(pass_count+fail_count)))));
+",pass_count, fail_count, pass_count+fail_count, (pass_count*100/(pass_count+fail_count)))
+if(fail_count == 0){
+    console.log(chalk.green(result));
+} else{
+    console.log(chalk.red(result));
+}
+

@@ -1,7 +1,8 @@
 GET  => http://{server}/api/test0/test => 404 - We have not yet support this api
 POST => http://{server}/api/test0/create => {"name":"dip","count":1} => success
 
-!POST => http://{server}/api/test0/create => {"name":"dip","count":1} => "_id":"(?<id>.*)"
-!POST => http://{server}/api/test0/create => {"name":"dip","count":1} => "_id":"(?<id>.*) (\)INVLIAD REG"
-GET => http://{server}/api/test0/find?id={id}  => Find successfully with 1 items
-GET => http://{server}/api/test0/find?id={id}  => Test Error case
+!POST => http://{server}/api/test0/create => {"name":"dip","count":1} => "_id":"(?<id1>.*)"
+!POST => http://{server}/api/test0/create => {"name":"dip","count":1} => "_id":"(?<id2>.*)"
+!GET => http://{server}/api/test0/find?id={id1}  => Find successfully with 1 items
+GET => http://{server}/api/test0/find?id={id1}  => success
+GET => http://{server}/api/test0/find?id={id2}  => success
