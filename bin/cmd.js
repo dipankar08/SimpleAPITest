@@ -117,9 +117,8 @@ for(tc of testcase){
        //let final_url = format(tc.url, context);
         tc.url = render(tc.url, context);
         console.log(chalk.hex('#454545')(util.format("\n[TEST/%s] Executing: %s",tc.line, tc.url)));
-        console.log(tc)
+        //console.log(tc)
 
-        
         var res = request(tc.method,tc.url , {
             json:tc.data
         });
