@@ -6,6 +6,7 @@ const util = require('util');
 const format = require('string-format')
 var program = require('commander');
 var namedRegexp = require("named-js-regexp");
+const { render } = require('micromustache')
 
 var context = {}
 program
@@ -14,9 +15,9 @@ program
   .option('-l, --line <line_number>', 'It will execute that number only.')
   .parse(process.argv);
 
-//program.server = "simplestore1.herokuapp.com"
-//program.file = "./sample.txt"
-//program.line = 4;
+// program.server = "simplestore1.herokuapp.com"
+// program.file = "./sample.txt"
+// program.line = 4;
 
 if (program.server){
     //console.log("Server:"+program.server);
@@ -35,18 +36,18 @@ if(program.file){
 
 
 function build_test_from_line(line, i){
+    var tc ={}
+    tc['line'] = i+1;
     try{
-        var tc ={}
         if(line[0] === '!'){
             tc['isSetup'] = true;
             line = line.substring(1, line.length);
         }
 
         tokens = line.split("=>");
-    
-        tc['line'] = i+1;
         tc['method'] = tokens[0].trim()
         tc['url'] = tokens[1].trim()
+        
         if(tc['method'] === 'GET'){
             tc['expected'] = tokens[2].trim()
         } else if(tc['method'] === 'POST'){
@@ -55,12 +56,15 @@ function build_test_from_line(line, i){
         } else{
             console.log(chalk.blue(util.format('[ERROR/%s] Invalid Method found :%s', i, line)));
         }
-        return tc
     }
     catch(e){
-        console.log(chalk.blue(util.format('[ERROR/%s] Invalid testcase:%s', i, line)));
+        console.log(chalk.red(util.format('[ERROR/%s] Invalid testcase:%s', i, line)));
         console.log(e);
     }
+    if(tc.method == "POST" && ( !tc.data || !tc.expected)){
+        console.log(chalk.red(util.format('[ERROR/%s] YOU ARE MISSING POST DATA:%s', i, line)));
+    }
+    return tc;
 }
 
 var contents = fs.readFileSync(context.file, 'utf8');
@@ -98,22 +102,26 @@ var fail_count = 0;
 //console.log("[INFO] Executing...");
 
 for(tc of testcase){
-    var jsondata = ''
     try{
-        if(tc.data != undefined){
+        if(tc.data){
             // TODO : THIS IS A BUG AS THE CONTEXT IS NOT GETTING ADDED in BODY.
-            let final_data = tc.data; // format(tc.data, context); 
-            jsondata= JSON.parse(final_data)
+            //let final_data = format(tc.data, context);
+            tc.data = render(tc.data, context);
+            tc.data= JSON.parse(tc.data)
         }
     } catch(e){
+        console.log(e);
         console.log(chalk.blue(util.format('[ERROR/%s] Invalid json payload:%s',tc.line, tc.data)));
-        jsondata = tc.data;
     }
     try{
-        let final_url = format(tc.url, context);
-        console.log(chalk.hex('#454545')(util.format("\n[TEST/%s] Executing: %s",tc.line, final_url)));
-        var res = request(tc.method,final_url , {
-            json:jsondata
+       //let final_url = format(tc.url, context);
+        tc.url = render(tc.url, context);
+        console.log(chalk.hex('#454545')(util.format("\n[TEST/%s] Executing: %s",tc.line, tc.url)));
+        console.log(tc)
+
+        
+        var res = request(tc.method,tc.url , {
+            json:tc.data
         });
 
         if(res.statusCode != 200){
@@ -134,7 +142,7 @@ for(tc of testcase){
         }
 
         if(matched == null) {
-            console.log(chalk.red(util.format('[ERROR/%s] Output and Expected different:\nUrl:%s\nExpected: %s\nOutput:%s', tc.line,final_url,tc['expected'],resStr )));
+            console.log(chalk.red(util.format('[ERROR/%s] Output and Expected different:\nUrl:%s\nExpected: %s\nOutput:%s', tc.line,tc.url,tc['expected'],resStr )));
             fail_count++;
             continue;
         }
@@ -149,6 +157,7 @@ for(tc of testcase){
         if(matched.groups() != null && Object.keys(matched.groups()).length > 0){
             Object.assign(context, matched.groups());
             console.log(chalk.blue(util.format("[INFO/%s] Updated context: %o",tc.line, matched.groups())));
+            console.log(chalk.blue(util.format("[INFO/%s] New context: %o",tc.line, context)));
         }
     } catch(e){
         fail_count++;
