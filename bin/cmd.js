@@ -15,8 +15,8 @@ program
   .option('-l, --line <line_number>', 'It will execute that number only.')
   .parse(process.argv);
 
-// program.server = "simplestore1.herokuapp.com"
-// program.file = "./sample.txt"
+//program.server = "simplestore1.herokuapp.com"
+//program.file = "./sample.txt"
 // program.line = 4;
 
 if (program.server){
@@ -40,8 +40,20 @@ function build_test_from_line(line, i){
     tc['line'] = i+1;
     try{
         if(line[0] === '!'){
-            tc['isSetup'] = true;
+            tc['type'] = 'setup';
             line = line.substring(1, line.length);
+        } else if(line[0] === '$'){
+            tc['type'] = 'context';
+            line = line.substring(1, line.length);
+            tokens=line.split("=>");
+            if(tokens.length != 2){
+                console.log(chalk.blue(util.format('[ERROR/%s] YOU ARE SEEING CONTEXT IN WRONG WAY: :%s', i, line)));
+            }
+            tc['context'] ={}
+            tc['context'][tokens[0].trim()] = [tokens[1].trim()]
+            return tc;
+        } else {
+            tc['type'] = 'tc';
         }
 
         tokens = line.split("=>");
@@ -102,6 +114,14 @@ var fail_count = 0;
 //console.log("[INFO] Executing...");
 
 for(tc of testcase){
+
+    // if testcase type is context.
+    if(tc.type == 'context'){
+        console.log(chalk.green(util.format('[INFO/%s] Set Context %o',tc.line, tc.context)));
+        Object.assign(context, tc.context);
+        continue
+    }
+
     try{
         if(tc.data){
             // TODO : THIS IS A BUG AS THE CONTEXT IS NOT GETTING ADDED in BODY.
@@ -145,7 +165,7 @@ for(tc of testcase){
             fail_count++;
             continue;
         }
-        if(tc.isSetup != true){
+        if(tc.type === 'setup'){
             console.log(chalk.green(util.format('[INFO/%s] Test passed',tc.line)));
             pass_count++;
         } else{

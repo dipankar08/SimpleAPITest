@@ -1,3 +1,4 @@
+$server => simplestore1.herokuapp.com
 GET  => http://{{server}}/api/test0/test => 404 - We have not yet support this api
 POST => http://{{server}}/api/test0/create => {"name":"dip","count":1} => success
 
