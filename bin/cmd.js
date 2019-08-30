@@ -15,9 +15,9 @@ program
   .option('-l, --line <line_number>', 'It will execute that number only.')
   .parse(process.argv);
 
-//program.server = "simplestore1.herokuapp.com"
-//program.file = "./sample.txt"
-// program.line = 4;
+program.server = "simplestore.dipankar.co.in"
+program.file = "./sample.txt"
+//program.line = 10;
 
 if (program.server){
     //console.log("Server:"+program.server);
@@ -124,8 +124,6 @@ for(tc of testcase){
 
     try{
         if(tc.data){
-            // TODO : THIS IS A BUG AS THE CONTEXT IS NOT GETTING ADDED in BODY.
-            //let final_data = format(tc.data, context);
             tc.data = render(tc.data, context);
             tc.data= JSON.parse(tc.data)
         }
@@ -134,7 +132,6 @@ for(tc of testcase){
         console.log(chalk.blue(util.format('[ERROR/%s] Invalid json payload:%s',tc.line, tc.data)));
     }
     try{
-       //let final_url = format(tc.url, context);
         tc.url = render(tc.url, context);
         console.log(chalk.hex('#454545')(util.format("\n[TEST/%s] Executing: %s",tc.line, tc.url)));
         //console.log(tc)
