@@ -15,8 +15,8 @@ program
   .option('-l, --line <line_number>', 'It will execute that number only.')
   .parse(process.argv);
 
-program.server = "simplestore.dipankar.co.in"
-program.file = "./sample.txt"
+//program.server = "simplestore.dipankar.co.in"
+//program.file = "./sample.txt"
 //program.line = 10;
 
 if (program.server){
