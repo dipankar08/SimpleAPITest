@@ -84,27 +84,22 @@ var contents = fs.readFileSync(context.file, 'utf8');
 var testcase = []
 
 var lines = contents.split("\n");
+var lineIdx =0;
 if(program.line){
     // Execute only line that line:
-    console.log("Executing a only line:"+program.line)
-    program.line = parseInt(program.line) -1;;
-    if(program.line>=lines.length){
-        console.log("Invalid number, The line nunber should be <= "+lines.length)
-        return;
+    console.log("Executing from Line: :"+program.line)
+    lineIdx = parseInt(program.line) -1;
+} 
+
+for(;lineIdx<lines.length;lineIdx++){
+    line = lines[lineIdx]
+    if(line.trim().length == 0){
+        continue;
     }
-    testcase.push(build_test_from_line(lines[program.line], program.line));
-    console.log(testcase);
-} else {
-    for(var i =0;i<lines.length;i++){
-        line = lines[i]
-        if(line.trim().length == 0){
-            continue;
-        }
-        if(line[0] === '#'){
-            continue;
-        }
-        testcase.push(build_test_from_line(line, i));
+    if(line[0] === '#'){
+        continue;
     }
+    testcase.push(build_test_from_line(line, lineIdx));
 }
 
 
