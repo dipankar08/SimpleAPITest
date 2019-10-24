@@ -15,9 +15,9 @@ program
   .option('-l, --line <line_number>', 'It will execute that number only.')
   .parse(process.argv);
 
-//program.server = "simplestore.dipankar.co.in"
-//program.file = "./sample.txt"
-//program.line = 10;
+program.server = "simplestore.dipankar.co.in"
+program.file = "./sample.txt"
+program.line = 5;
 
 if (program.server){
     //console.log("Server:"+program.server);
@@ -84,9 +84,9 @@ var contents = fs.readFileSync(context.file, 'utf8');
 var testcase = []
 
 var lines = contents.split("\n");
-var lineIdx =0;
+var lineIdx = 0;
 if(program.line){
-    // Execute only line that line:
+    // Execute from that line.s
     console.log("Executing from Line: :"+program.line)
     lineIdx = parseInt(program.line) -1;
 } 
