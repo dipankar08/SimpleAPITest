@@ -15,8 +15,9 @@ program
   .option('-l, --line <line_number>', 'It will execute that number only.')
   .parse(process.argv);
 
-program.server = "simplestore.dipankar.co.in"
-program.file = "./sample.txt"
+// For test uncomment this line and run <node bin/cmd.js>
+//program.server = "simplestore.dipankar.co.in"
+//program.file = "./sample.txt"
 //program.line = 5;
 
 if (program.server){
