@@ -10,3 +10,4 @@ sleep 2
 GET => http://{{server}}/api/test0/find?id={{id1}}  => success
 GET => http://{{server}}/api/test0/find?id={{id2}}  => success
 POST => http://{{server}}/api/test0/create => {"idd":"{{id2}}"} => success
+GET => http://simplestore.dipankar.co.in/api/system_payment/stripe => TypeError: Cannot read property 'object' of undefined

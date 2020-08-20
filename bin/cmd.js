@@ -23,7 +23,7 @@ function sleep(s) {
 // For test uncomment this line and run <node bin/cmd.js>
 //program.server = "simplestore.dipankar.co.in"
 //program.file = "./sample.txt"
-//program.line = 5;
+//program.line = 13;
 
 if (program.server){
     //console.log("Server:"+program.server);
@@ -134,13 +134,19 @@ async function run_test_case(testcase){
                 json:tc.data
             });
     
+            // We also needs to keep track status code
             if(res.statusCode != 200){
                 console.log(chalk.red(util.format('[ERROR/%s] Error as res.statusCode :%s', tc.line, res.statusCode)));
-                fail_count++;
-                continue;
+                //fail_count++;
+                //continue;
             }
-    
-            var resStr = res.getBody('utf8');
+            var resStr ="Unknwon resp"
+            try{
+               resStr = res.getBody('utf8');
+            } catch(e){
+               resStr = e.toString();
+            }
+
             var matched ;
             try{
                 matched = new namedRegexp(tc['expected']).exec(resStr);
